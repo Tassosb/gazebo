@@ -1,6 +1,7 @@
 require_relative 'db_connection'
 require_relative 'relation'
 require_relative 'search_params'
+require_relative 'errors'
 
 module Searchable
   def find_by(params)
@@ -21,24 +22,24 @@ module Searchable
   def where(*params)
     search_params = SearchParams.new(params)
 
-    query_hdoc = <<-SQL
-      SELECT
-        *
-      FROM
-        #{self.table_name}
-      WHERE
-        #{search_params.where_line}
-    SQL
+    # query_hdoc = <<-SQL
+    #   SELECT
+    #     *
+    #   FROM
+    #     #{self.table_name}
+    #   WHERE
+    #     #{search_params.where_line}
+    # SQL
 
-    Relation.new(query_hdoc, search_params.values, self)
-  end
+    query = {
+      where: [search_params.where_line]
+    }
 
-  def parse_all(all_options)
-    all_options.map { |options| self.new(options) }
+    Relation.new(query, search_params.values, self)
   end
 
   def find(id)
-    found_data = DBConnection.execute(<<-SQL)
+    search_datum = DBConnection.get_first_row(<<-SQL)
       SELECT
         *
       FROM
@@ -47,6 +48,42 @@ module Searchable
         id = #{id}
     SQL
 
-    parse_all(found_data).first
+    search_datum.nil? ? nil : self.new(search_datum)
+  end
+
+  def join_on(assoc_options)
+    if assoc_options.is_a?(BelongsToOptions)
+      own_column = assoc_options.foreign_key
+      other_column = assoc_options.primary_key
+    elsif assoc_options.is_a?(HasManyOptions)
+      own_column = assoc_options.primary_key
+      other_column = assoc_options.foreign_key
+    end
+
+    "#{self.table_name}.#{own_column}" +
+    " = " + "#{assoc_options.table_name}.#{other_column}"
+  end
+
+  def joins(association)
+    options = self.assoc_options[association]
+
+    unless options
+      raise InvalidInput, "Argument must be an association(type: symbol)"
+    end
+
+    # query_hdoc = <<-SQL
+    #   SELECT
+    #     #{self.table_name}.*
+    #   FROM
+    #     #{self.table_name}
+    #   INNER JOIN
+    #     #{options.table_name} ON #{join_on(options)}
+    # SQL
+
+    query = {
+      join: ["#{options.table_name} ON #{join_on(options)}"]
+    }
+
+    Relation.new(query, [], self)
   end
 end

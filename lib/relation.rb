@@ -6,22 +6,41 @@ class Relation
 
   attr_reader :query, :params, :source_class
 
+
+  def defaults
+    {
+      select: "#{source_class.table_name}.*",
+      where: [],
+      join: []
+    }
+  end
+
   def initialize(query, params, source_class)
-    @query = query.scan(/\S+/).join(' ')
-    @params = params
     @source_class = source_class
+    @query = defaults.merge(query)
+    @params = params
   end
 
-  def update(add_query, add_params)
-    @query += add_query
-    params.concat(add_params)
-  end
-
-  def where(*params)
-    search_params = SearchParams.new(params)
-    add_to_query = " AND #{search_params.where_line}"
-    update(add_to_query, search_params.values)
+  def where(*where_params)
+    search_params = SearchParams.new(where_params)
+    query[:where] << search_params.where_line
+    params.concat(search_params.values)
     self
+  end
+
+  def build_query
+    sql = <<-SQL
+      SELECT #{query[:select]}
+      FROM #{source_class.table_name}
+    SQL
+    
+    sql << query[:join].map { |clause| " JOIN #{clause} \n" }.join
+    sql << "WHERE " + query[:where].join(" AND ") unless query[:where].empty?
+    sql
+  end
+
+  def join_clauses
+    query[:join].map { |clause| "\n JOIN #{clause}" }.join
   end
 
   def each(&prc)
@@ -29,7 +48,7 @@ class Relation
   end
 
   def to_a
-    data = DBConnection.execute(query, params)
+    data = DBConnection.execute(build_query, params)
     data.map { |datum| source_class.new(datum) }
   end
 

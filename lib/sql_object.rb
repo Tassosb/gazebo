@@ -53,6 +53,11 @@ class SQLObject
     parse_all(all_hashes)
   end
 
+
+  def self.parse_all(all_options)
+    all_options.map { |options| self.new(options) }
+  end
+
   def self.first
     first_data = DBConnection.get_first_row(<<-SQL)
       SELECT

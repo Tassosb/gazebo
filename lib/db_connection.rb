@@ -62,7 +62,7 @@ class DBConnection
 
     output = query.gsub(/\s+/, ' ')
     unless bind_params.empty?
-      output += bind_params.inspect
+      output += " #{bind_params.inspect}"
     end
 
     puts output.colorize(random_color)
