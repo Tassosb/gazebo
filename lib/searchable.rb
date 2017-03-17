@@ -32,4 +32,21 @@ module Searchable
 
     Relation.new(query_hdoc, search_params.values, self)
   end
+
+  def parse_all(all_options)
+    all_options.map { |options| self.new(options) }
+  end
+
+  def find(id)
+    found_data = DBConnection.execute(<<-SQL)
+      SELECT
+        *
+      FROM
+        #{self.table_name}
+      WHERE
+        id = #{id}
+    SQL
+
+    parse_all(found_data).first
+  end
 end
