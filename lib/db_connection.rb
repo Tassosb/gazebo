@@ -1,6 +1,7 @@
 require 'sqlite3'
+require 'colorize'
 
-PRINT_QUERIES = ENV['PRINT_QUERIES'] == 'true'
+PRINT_QUERIES = true
 # https://tomafro.net/2010/01/tip-relative-paths-with-file-expand-path
 ROOT_FOLDER = File.join(File.dirname(__FILE__), '..')
 CATS_SQL_FILE = File.join(ROOT_FOLDER, 'cats.sql')
@@ -52,14 +53,18 @@ class DBConnection
 
   private
 
-  def self.print_query(query, *interpolation_args)
+  def self.random_color
+    [:blue, :light_blue, :red, :green, :yellow].sample
+  end
+
+  def self.print_query(query, bind_params = [])
     return unless PRINT_QUERIES
 
-    puts '--------------------'
-    puts query
-    unless interpolation_args.empty?
-      puts "interpolate: #{interpolation_args.inspect}"
+    output = query.gsub(/\s+/, ' ')
+    unless bind_params.empty?
+      output += bind_params.inspect
     end
-    puts '--------------------'
+
+    puts output.colorize(random_color)
   end
 end

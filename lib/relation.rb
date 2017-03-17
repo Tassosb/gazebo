@@ -1,5 +1,4 @@
 require_relative 'db_connection'
-require_relative 'query_utility'
 require_relative 'search_params'
 
 class Relation
@@ -30,8 +29,11 @@ class Relation
   end
 
   def to_a
-    puts "#{query}, #{params}"
     data = DBConnection.execute(query, params)
     data.map { |datum| source_class.new(datum) }
+  end
+
+  def inspect
+    p to_a
   end
 end
