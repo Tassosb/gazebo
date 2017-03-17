@@ -117,7 +117,9 @@ class SQLObject
       id ? update : insert
       true
     else
-      errors.each { |key, val| puts "#{key} #{val}" }
+      errors.each do |key, messages|
+        messages.each { |m| puts "#{key} #{m}" }
+      end
       false
     end
   end
@@ -175,11 +177,11 @@ class SQLObject
   end
 
   def errors
-    @errors ||= {}
+    @errors ||= Hash.new { |h, k| h[k] = [] }
   end
 
   def validate!
-    @errors = {}
+    @errors = Hash.new { |h, k| h[k] = [] }
 
     self.class.validations.each do |validation|
       self.send(validation)
@@ -188,6 +190,6 @@ class SQLObject
 
   def valid?
     validate!
-    errors.empty?
+    errors.all? { |_, v| v.empty? }
   end
 end
