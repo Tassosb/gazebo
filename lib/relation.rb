@@ -1,4 +1,6 @@
 require_relative 'db_connection'
+require_relative 'query_utility'
+require_relative 'search_params'
 
 class Relation
   include Enumerable
@@ -7,7 +9,8 @@ class Relation
 
   def initialize(query, params, source_class)
     @query = query.scan(/\S+/).join(' ')
-    @params, @source_class = params, source_class
+    @params = params
+    @source_class = source_class
   end
 
   def update(add_query, add_params)
@@ -15,15 +18,11 @@ class Relation
     params.concat(add_params)
   end
 
-  def where(params)
-    add_to_hdoc = " AND #{where_line(params)}"
-
-    update(add_to_hdoc, params.values)
+  def where(*params)
+    search_params = SearchParams.new(params)
+    add_to_query = " AND #{search_params.where_line}"
+    update(add_to_query, search_params.values)
     self
-  end
-
-  def where_line(params)
-    params.keys.map { |param| "#{param} = ?"}.join(' AND ')
   end
 
   def each(&prc)
