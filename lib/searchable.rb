@@ -1,18 +1,21 @@
 require_relative 'db_connection'
 require_relative 'relation'
+require_relative 'search_params'
 
 module Searchable
   def find_by(params)
-    search_datum = DBConnection.get_first_row(<<-SQL, params.values)
+    search_params = SearchParams.new([params])
+
+    search_datum = DBConnection.get_first_row(<<-SQL, search_params.values)
       SELECT
         *
       FROM
         #{self.table_name}
       WHERE
-        #{where_line(params)}
+        #{search_params.where_line}
     SQL
 
-    self.new(search_datum)
+    search_datum.nil? ? nil : self.new(search_datum)
   end
 
   def where(*params)

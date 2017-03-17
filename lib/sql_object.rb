@@ -1,11 +1,13 @@
 require_relative 'db_connection'
 require_relative 'searchable'
 require_relative 'associatable'
+require_relative 'validatable'
 require 'active_support/inflector'
 
 class SQLObject
   extend Associatable
   extend Searchable
+  extend Validatable
 
   def self.columns
     return @columns if @columns
@@ -98,15 +100,25 @@ class SQLObject
     self.new(last_data)
   end
 
+  def self.validations
+    @validations ||= []
+  end
+
   def initialize(params = {})
-    params.each do |attr_name, val|
-      attr_name = attr_name.to_sym
+    self.class.columns.each do |attr_name|
+      params_val = params[attr_name] || params[attr_name.to_s]
+      send("#{attr_name}=", params_val)
+    end
+  end
 
-      unless self.class.columns.include?(attr_name)
-        raise "unknown attribute '#{attr_name}'"
-      end
-
-      send("#{attr_name}=", val)
+  def save
+    validate!
+    if valid?
+      id ? update : insert
+      true
+    else
+      errors.each { |key, val| puts "#{key} #{val}" }
+      false
     end
   end
 
@@ -119,7 +131,7 @@ class SQLObject
   end
 
   def insert
-    DBConnection.execute(<<-SQL, attribute_values)
+    DBConnection.execute(<<-SQL, attr_values_to_update)
       INSERT INTO
         #{self.class.table_name} (#{col_names})
       VALUES
@@ -144,7 +156,7 @@ class SQLObject
   end
 
   def question_marks
-    (["?"] * attributes.count).join(', ')
+    (["?"] * (attributes.count - 1)).join(', ')
   end
 
   def update_set_line
@@ -162,7 +174,20 @@ class SQLObject
     SQL
   end
 
-  def save
-    id ? update : insert
+  def errors
+    @errors ||= {}
+  end
+
+  def validate!
+    @errors = {}
+
+    self.class.validations.each do |validation|
+      self.send(validation)
+    end
+  end
+
+  def valid?
+    validate!
+    errors.empty?
   end
 end
