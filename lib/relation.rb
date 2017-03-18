@@ -8,10 +8,12 @@ class Relation
 
   def defaults
     {
-      select: "#{source_class.table_name}.*",
-      where: WhereClause.new,
+      select: SelectClause.new(["#{source_class.table_name}.*"]),
+      from: FromClause.new(source_class.table_name),
       join: JoinOptions.new,
-      limit: LimitClause.new
+      where: WhereClause.new,
+      limit: LimitClause.new,
+      group:
     }
   end
 
@@ -39,17 +41,20 @@ class Relation
     self
   end
 
+  def select(*params)
+    query[:select].params = params
+    self
+  end
+
+  def distinct
+    query[:select].distinct = true
+    self
+  end
+
   def as_sql
-    sql = <<-SQL
-      SELECT #{query[:select]}
-      FROM #{source_class.table_name}
-    SQL
-
-    [:join, :where, :limit].each do |clause|
-      sql << query[clause].as_sql
-    end
-
-    sql
+    [:select, :from, :join, :where, :limit].map do |clause|
+      query[clause].as_sql
+    end.join(" \n ")
   end
 
   def each(&prc)

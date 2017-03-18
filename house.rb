@@ -5,8 +5,3 @@ class House < SQLObject
 
   finalize!
 end
-
-# load 'house.rb'
-# load 'cat.rb'
-# load 'human.rb'
-# House.find(1).cats

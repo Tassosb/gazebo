@@ -43,16 +43,8 @@ class SQLObject
   end
 
   def self.all
-    # all_hashes = DBConnection.execute(<<-SQL)
-    #   SELECT
-    #     *
-    #   FROM
-    #     #{self.table_name}
-    # SQL
-
     Relation.new({}, self)
   end
-
 
   def self.parse_all(all_options)
     all_options.map { |options| self.new(options) }
@@ -96,6 +88,14 @@ class SQLObject
     self.class.columns.each do |attr_name|
       params_val = params[attr_name] || params[attr_name.to_s]
       send("#{attr_name}=", params_val)
+    end
+
+    params.keys.each do |param|
+      next if self.class.columns.include?(param.to_sym)
+
+      define_method(param) do
+        params[param]
+      end
     end
   end
 

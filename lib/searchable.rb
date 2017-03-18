@@ -50,4 +50,12 @@ module Searchable
 
     Relation.new(query, self)
   end
+
+  def select(*params)
+    query = {
+      select: SelectClause.new(params)
+    }
+
+    Relation.new(query, self)
+  end
 end
