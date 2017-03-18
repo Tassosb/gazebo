@@ -43,14 +43,14 @@ class SQLObject
   end
 
   def self.all
-    all_hashes = DBConnection.execute(<<-SQL)
-      SELECT
-        *
-      FROM
-        #{self.table_name}
-    SQL
+    # all_hashes = DBConnection.execute(<<-SQL)
+    #   SELECT
+    #     *
+    #   FROM
+    #     #{self.table_name}
+    # SQL
 
-    parse_all(all_hashes)
+    Relation.new({}, self)
   end
 
 
@@ -105,10 +105,14 @@ class SQLObject
       id ? update : insert
       true
     else
-      errors.each do |key, messages|
-        messages.each { |m| puts "#{key} #{m}" }
-      end
+      show_errors
       false
+    end
+  end
+
+  def show_errors
+    errors.each do |key, messages|
+      messages.each { |m| puts "#{key} #{m}" }
     end
   end
 

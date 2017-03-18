@@ -4,55 +4,73 @@ require_relative 'search_params'
 class Relation
   include Enumerable
 
-  attr_reader :query, :params, :source_class
-
+  attr_reader :query, :cache, :source_class
 
   def defaults
     {
       select: "#{source_class.table_name}.*",
-      where: [],
-      join: []
+      where: WhereClause.new,
+      join: JoinOptions.new,
+      limit: LimitClause.new
     }
   end
 
-  def initialize(query, params, source_class)
+  def initialize(query, source_class)
     @source_class = source_class
     @query = defaults.merge(query)
-    @params = params
+    @cache = nil
   end
 
   def where(*where_params)
-    search_params = SearchParams.new(where_params)
-    query[:where] << search_params.where_line
-    params.concat(search_params.values)
+    query[:where] << where_params
+    empty_cache!
     self
   end
 
-  def build_query
+  def joins(association, join_class = source_class)
+    options = join_class.assoc_options[association]
+    query[:join].append(options, join_class.table_name)
+    empty_cache!
+    self
+  end
+
+  def limit(n)
+    query[:limit].set(n)
+    self
+  end
+
+  def as_sql
     sql = <<-SQL
       SELECT #{query[:select]}
       FROM #{source_class.table_name}
     SQL
-    
-    sql << query[:join].map { |clause| " JOIN #{clause} \n" }.join
-    sql << "WHERE " + query[:where].join(" AND ") unless query[:where].empty?
-    sql
-  end
 
-  def join_clauses
-    query[:join].map { |clause| "\n JOIN #{clause}" }.join
+    [:join, :where, :limit].each do |clause|
+      sql << query[clause].as_sql
+    end
+
+    sql
   end
 
   def each(&prc)
     to_a.each { |el| prc.call(el) }
   end
 
+  def bind_params
+    query[:where].values
+  end
+
   def to_a
-    data = DBConnection.execute(build_query, params)
-    data.map { |datum| source_class.new(datum) }
+    return cache if cache
+    data = DBConnection.execute(as_sql, bind_params)
+    @cache = data.map { |datum| source_class.new(datum) }
   end
 
   def inspect
     p to_a
+  end
+
+  def empty_cache!
+    @cache = nil
   end
 end

@@ -5,37 +5,27 @@ require_relative 'errors'
 
 module Searchable
   def find_by(params)
-    search_params = SearchParams.new([params])
+    where_clause = WhereClause.new([params])
 
-    search_datum = DBConnection.get_first_row(<<-SQL, search_params.values)
+    search_datum = DBConnection.get_first_row(<<-SQL, where_clause.values)
       SELECT
         *
       FROM
         #{self.table_name}
       WHERE
-        #{search_params.where_line}
+        #{where_clause.as_sql}
     SQL
 
     search_datum.nil? ? nil : self.new(search_datum)
   end
 
   def where(*params)
-    search_params = SearchParams.new(params)
-
-    # query_hdoc = <<-SQL
-    #   SELECT
-    #     *
-    #   FROM
-    #     #{self.table_name}
-    #   WHERE
-    #     #{search_params.where_line}
-    # SQL
-
+    # where_clause = WhereClause.new(params)
     query = {
-      where: [search_params.where_line]
+      where: WhereClause.new(params)
     }
 
-    Relation.new(query, search_params.values, self)
+    Relation.new(query, self)
   end
 
   def find(id)
@@ -51,39 +41,13 @@ module Searchable
     search_datum.nil? ? nil : self.new(search_datum)
   end
 
-  def join_on(assoc_options)
-    if assoc_options.is_a?(BelongsToOptions)
-      own_column = assoc_options.foreign_key
-      other_column = assoc_options.primary_key
-    elsif assoc_options.is_a?(HasManyOptions)
-      own_column = assoc_options.primary_key
-      other_column = assoc_options.foreign_key
-    end
-
-    "#{self.table_name}.#{own_column}" +
-    " = " + "#{assoc_options.table_name}.#{other_column}"
-  end
-
-  def joins(association)
+  def joins(association, _ = nil)
     options = self.assoc_options[association]
 
-    unless options
-      raise InvalidInput, "Argument must be an association(type: symbol)"
-    end
-
-    # query_hdoc = <<-SQL
-    #   SELECT
-    #     #{self.table_name}.*
-    #   FROM
-    #     #{self.table_name}
-    #   INNER JOIN
-    #     #{options.table_name} ON #{join_on(options)}
-    # SQL
-
     query = {
-      join: ["#{options.table_name} ON #{join_on(options)}"]
+      join: JoinOptions.new(options, self.table_name)
     }
 
-    Relation.new(query, [], self)
+    Relation.new(query, self)
   end
 end
