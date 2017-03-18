@@ -20,12 +20,10 @@ module Searchable
   end
 
   def where(*params)
-    # where_clause = WhereClause.new(params)
-    query = {
-      where: WhereClause.new(params)
-    }
-
-    Relation.new(query, self)
+    Relation.new(
+      {where: WhereClause.new(params)},
+      self
+    )
   end
 
   def find(id)
@@ -44,18 +42,23 @@ module Searchable
   def joins(association, _ = nil)
     options = self.assoc_options[association]
 
-    query = {
-      join: JoinOptions.new(options, self.table_name)
-    }
-
-    Relation.new(query, self)
+    Relation.new(
+      {join: JoinOptions.new(options, self.table_name)},
+      self
+    )
   end
 
   def select(*params)
-    query = {
-      select: SelectClause.new(params)
-    }
+    Relation.new(
+      {select: SelectClause.new(params)},
+      self
+    )
+  end
 
-    Relation.new(query, self)
+  def group(group_attr)
+    Relation.new(
+      {group: GroupClause.new(group_attr)},
+      self
+    )
   end
 end

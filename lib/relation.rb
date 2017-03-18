@@ -4,7 +4,7 @@ require_relative 'search_params'
 class Relation
   include Enumerable
 
-  attr_reader :query, :cache, :source_class
+  attr_reader :query, :cache, :source_class, :data
 
   def defaults
     {
@@ -13,7 +13,7 @@ class Relation
       join: JoinOptions.new,
       where: WhereClause.new,
       limit: LimitClause.new,
-      group:
+      group: GroupClause.new
     }
   end
 
@@ -51,10 +51,20 @@ class Relation
     self
   end
 
+  def group(grouping_attr)
+    query[:group].grouping_attr = grouping_attr
+    self
+  end
+
   def as_sql
-    [:select, :from, :join, :where, :limit].map do |clause|
+    [:select, :from, :join, :where, :group, :limit].map do |clause|
       query[clause].as_sql
     end.join(" \n ")
+  end
+
+  def as_json
+    execute! if cache.nil?
+    cache
   end
 
   def each(&prc)
@@ -66,9 +76,12 @@ class Relation
   end
 
   def to_a
-    return cache if cache
-    data = DBConnection.execute(as_sql, bind_params)
-    @cache = data.map { |datum| source_class.new(datum) }
+    execute! if cache.nil?
+    cache.map { |datum| source_class.new(datum) }
+  end
+
+  def execute!
+    @cache = DBConnection.execute(as_sql, bind_params)
   end
 
   def inspect

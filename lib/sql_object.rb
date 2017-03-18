@@ -89,14 +89,6 @@ class SQLObject
       params_val = params[attr_name] || params[attr_name.to_s]
       send("#{attr_name}=", params_val)
     end
-
-    params.keys.each do |param|
-      next if self.class.columns.include?(param.to_sym)
-
-      define_method(param) do
-        params[param]
-      end
-    end
   end
 
   def save
