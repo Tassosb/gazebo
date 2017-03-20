@@ -1,5 +1,4 @@
 require_relative 'db_connection'
-require_relative 'search_params'
 
 class Relation
   include Enumerable

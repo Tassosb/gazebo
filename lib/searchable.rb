@@ -1,6 +1,5 @@
 require_relative 'db_connection'
 require_relative 'relation'
-require_relative 'search_params'
 require_relative 'errors'
 
 module Searchable
