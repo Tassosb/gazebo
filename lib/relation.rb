@@ -38,21 +38,25 @@ class Relation
 
   def limit(n)
     query[:limit].set(n)
+    empty_cache!
     self
   end
 
   def select(*params)
     query[:select].params = params
+    empty_cache!
     self
   end
 
   def distinct
     query[:select].distinct = true
+    empty_cache!
     self
   end
 
   def group(grouping_attr)
     query[:group].grouping_attr = grouping_attr
+    empty_cache!
     self
   end
 
@@ -62,7 +66,7 @@ class Relation
     end.join(" \n ")
   end
 
-  def as_json
+  def data
     execute! if cache.nil?
     cache
   end
