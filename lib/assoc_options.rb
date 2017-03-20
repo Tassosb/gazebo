@@ -28,6 +28,14 @@ class BelongsToOptions < AssocOptions
       send("#{option}=", opt_name)
     end
   end
+
+  def own_join_column
+    foreign_key
+  end
+
+  def other_join_column
+    primary_key
+  end
 end
 
 class HasManyOptions < AssocOptions
@@ -44,5 +52,13 @@ class HasManyOptions < AssocOptions
     defaults.merge(options).each do |option, opt_name|
       send("#{option}=", opt_name)
     end
+  end
+
+  def own_join_column
+    primary_key
+  end
+
+  def other_join_column
+    foreign_key
   end
 end

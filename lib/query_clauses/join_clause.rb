@@ -15,16 +15,16 @@ class JoinClause
   end
 
   def on_clause
-    if assoc_options.is_a?(BelongsToOptions)
-      own_column = assoc_options.foreign_key
-      other_column = assoc_options.primary_key
-    elsif assoc_options.is_a?(HasManyOptions)
-      own_column = assoc_options.primary_key
-      other_column = assoc_options.foreign_key
-    end
+    # if assoc_options.is_a?(BelongsToOptions)
+    #   own_column = assoc_options.foreign_key
+    #   other_column = assoc_options.primary_key
+    # elsif assoc_options.is_a?(HasManyOptions)
+    #   own_column = assoc_options.primary_key
+    #   other_column = assoc_options.foreign_key
+    # end
 
-    "#{source_table}.#{own_column}" +
-    " = " + "#{other_table}.#{other_column}"
+    "#{source_table}.#{assoc_options.own_join_column}" +
+    " = " + "#{other_table}.#{assoc_options.other_join_column}"
   end
 
   def as_sql
