@@ -3,7 +3,7 @@ class Static
 
   def initialize(app)
     @app = app
-    @root = :public
+    @root = 'demo/public'
     @file_server = FileServer.new
   end
 
@@ -16,7 +16,6 @@ class Static
     else
       res = app.call(env)
     end
-
     res.finish
   end
 

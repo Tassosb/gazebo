@@ -17,7 +17,7 @@ class ShowExceptions
 
   def render_exception(e)
     res = Rack::Response.new
-    file_content = File.read('lib/templates/rescue.html.erb')
+    file_content = File.read('activecondor/lib/templates/rescue.html.erb')
     content = ERB.new(file_content).result(binding)
 
     res['Content-Type'] = 'text/html'
