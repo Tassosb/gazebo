@@ -60,4 +60,11 @@ module Searchable
       self
     )
   end
+
+  def order(ordering_attr)
+    Relation.new(
+      {order: OrderClause.new(ordering_attr)},
+      self
+    )
+  end
 end

@@ -12,8 +12,13 @@ class Relation
       join: JoinOptions.new,
       where: WhereClause.new,
       limit: LimitClause.new,
-      group: GroupClause.new
+      group: GroupClause.new,
+      order: OrderClause.new
     }
+  end
+
+  def self.ordered_clauses
+    [:select, :from, :join, :where, :limit, :group, :order]
   end
 
   def initialize(query, source_class)
@@ -59,8 +64,14 @@ class Relation
     self
   end
 
+  def order(ordering_attr)
+    query[:order].ordering_attr = ordering_attr
+    empty_cache!
+    self
+  end
+
   def as_sql
-    [:select, :from, :join, :where, :group, :limit].map do |clause|
+    Relation.ordered_clauses.map do |clause|
       query[clause].as_sql
     end.join(" \n ")
   end
