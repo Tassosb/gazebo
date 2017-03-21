@@ -1,6 +1,3 @@
-require 'erb'
-require 'rack'
-
 class ShowExceptions
   attr_reader :app, :error
 

@@ -2,7 +2,7 @@ require_relative 'db_connection'
 require_relative 'searchable'
 require_relative 'associatable'
 require_relative 'validatable'
-require 'active_support/inflector'
+
 
 class SQLObject
   extend Associatable

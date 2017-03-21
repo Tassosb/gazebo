@@ -1,5 +1,3 @@
-require 'active_support/inflector'
-require 'byebug'
 require_relative 'searchable'
 require_relative 'assoc_options'
 

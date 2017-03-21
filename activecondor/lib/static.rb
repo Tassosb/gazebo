@@ -1,5 +1,3 @@
-require 'rack'
-
 class Static
   attr_reader :file_server, :app, :root
 

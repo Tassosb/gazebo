@@ -1,6 +1,5 @@
 require_relative 'db_connection'
 require_relative 'relation'
-require_relative 'errors'
 
 module Searchable
   def find_by(params)

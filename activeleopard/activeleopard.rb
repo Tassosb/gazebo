@@ -1,0 +1,5 @@
+require_relative 'lib/sql_object'
+require_relative 'lib/query_clauses/all_clauses'
+require_relative 'lib/errors'
+require_relative 'lib/assoc_options'
+require 'active_support/inflector'
