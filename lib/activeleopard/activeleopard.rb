@@ -1,0 +1,5 @@
+require 'active_support/inflector'
+require_relative 'lib/activeleopard_base'
+require_relative 'lib/query_clauses/all_clauses'
+require_relative 'lib/errors'
+require_relative 'lib/assoc_options'
