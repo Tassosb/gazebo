@@ -3,7 +3,7 @@ class StaticAssetServer
 
   def initialize(app)
     @app = app
-    @root = 'demo/public'
+    @root = 'demo/app/assets/'
     @file_server = FileServer.new
   end
 
@@ -20,7 +20,7 @@ class StaticAssetServer
   end
 
   def servable?(path)
-    path.match("/#{root}")
+    path.match("#{root}")
   end
 end
 

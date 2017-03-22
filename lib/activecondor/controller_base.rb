@@ -58,8 +58,11 @@ class ControllerBase
     controller_name = self.class.to_s.underscore[0..-("_controller".length + 1)]
     file_path = "app/views/#{controller_name}/#{template_name}.html.erb"
     file_content = File.read(file_path)
-    content = ERB.new(file_content).result(binding)
 
+    application = File.read("app/views/layout/application.html.erb")
+    application.sub!(/__YIELD__/, file_content)
+
+    content = ERB.new(application).result(binding)
     render_content(content, 'text/html')
   end
 

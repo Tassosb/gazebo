@@ -1,6 +1,4 @@
 PRINT_QUERIES = true
-# https://tomafro.net/2010/01/tip-relative-paths-with-file-expand-path
-# ROOT_FOLDER = File.join(File.dirname(__FILE__), '..')
 
 class DBConnection
   def self.open(db_file_name)

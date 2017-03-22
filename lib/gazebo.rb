@@ -5,6 +5,7 @@ require_relative 'activeleopard/activeleopard'
 require_relative 'activecondor/activecondor'
 require_relative 'static_asset_server'
 require_relative 'show_exceptions'
+require_relative 'auto_loader'
 require_relative 'router'
 
 module Gazebo
