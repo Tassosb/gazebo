@@ -1,6 +1,3 @@
-require_relative 'db_connection'
-require_relative 'relation'
-
 module Searchable
   def find_by(params)
     where_clause = WhereClause.new([params])

@@ -1,6 +1,3 @@
-require_relative 'searchable'
-require_relative 'assoc_options'
-
 module Associatable
   def belongs_to(name, options = {})
     options = BelongsToOptions.new(name, options)

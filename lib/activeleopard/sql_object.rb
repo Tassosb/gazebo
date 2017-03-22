@@ -1,13 +1,4 @@
-require_relative 'db_connection'
-require_relative 'searchable'
-require_relative 'associatable'
-require_relative 'validatable'
-
-
 class SQLObject
-  extend Associatable
-  extend Searchable
-  extend Validatable
 
   def self.columns
     return @columns if @columns

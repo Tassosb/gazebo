@@ -1,7 +1,0 @@
-require_relative 'join_clause'
-require_relative 'where_clause'
-require_relative 'limit_clause'
-require_relative 'select_clause'
-require_relative 'from_clause'
-require_relative 'group_clause'
-require_relative 'order_clause'

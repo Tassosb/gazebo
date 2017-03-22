@@ -1,5 +1,3 @@
-require_relative 'db_connection'
-
 class Relation
   include Enumerable
 

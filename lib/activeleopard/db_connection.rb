@@ -1,11 +1,6 @@
-require 'sqlite3'
-require 'colorize'
-
 PRINT_QUERIES = true
 # https://tomafro.net/2010/01/tip-relative-paths-with-file-expand-path
-ROOT_FOLDER = File.join(File.dirname(__FILE__), '..')
-CATS_SQL_FILE = File.join(ROOT_FOLDER, '..', 'gazebo_app_database.sql')
-CATS_DB_FILE = File.join(ROOT_FOLDER, '..', 'gazebo_app_database.db')
+# ROOT_FOLDER = File.join(File.dirname(__FILE__), '..')
 
 class DBConnection
   def self.open(db_file_name)
@@ -17,13 +12,16 @@ class DBConnection
   end
 
   def self.reset
+    @sql_file ||= File.join(Gazebo::ROOT, 'db', 'gazebo_app_database.sql')
+    @db_file ||= File.join(Gazebo::ROOT, 'db', 'gazebo_app_database.db')
+
     commands = [
-      "rm '#{CATS_DB_FILE}'",
-      "cat '#{CATS_SQL_FILE}' | sqlite3 '#{CATS_DB_FILE}'"
+      "rm '#{@db_file}'",
+      "cat '#{@sql_file}' | sqlite3 '#{@db_file}'"
     ]
 
     commands.each { |command| `#{command}` }
-    DBConnection.open(CATS_DB_FILE)
+    DBConnection.open(@db_file)
   end
 
   def self.instance

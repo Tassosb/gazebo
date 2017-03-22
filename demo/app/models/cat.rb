@@ -1,4 +1,4 @@
-class Cat < SQLObject
+class Cat < ActiveLeopard::Base
   validates :name, presence: true, uniqueness: true
   validates :owner_id, presence: true, uniqueness: true
 

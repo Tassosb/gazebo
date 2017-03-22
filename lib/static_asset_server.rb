@@ -1,4 +1,4 @@
-class Static
+class StaticAssetServer
   attr_reader :file_server, :app, :root
 
   def initialize(app)
@@ -25,15 +25,6 @@ class Static
 end
 
 class FileServer
-  MIME_TYPES = {
-    '.txt' => 'text/plain',
-    '.jpg' => 'image/jpeg',
-    '.zip' => 'application/zip'
-  }
-
-  def initialize
-  end
-
   def call(env)
     res = Rack::Response.new
     file_name = requested_file_name(env)
@@ -49,7 +40,8 @@ class FileServer
 
   def serve(file_name, res)
     extension = File.extname(file_name)
-    content_type = MIME_TYPES[extension]
+    extension = '.json' if extension == '.map'
+    content_type = Rack::Mime::MIME_TYPES[extension]
 
     res['Content-Type'] = content_type
     file = File.read(file_name)

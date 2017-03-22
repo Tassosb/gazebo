@@ -1,4 +1,4 @@
-class CatsController < ControllerBase
+class CatsController < ActiveCondor::Base
   def go
     render_content("Hello from the controller", "text/html")
   end
