@@ -1,31 +1,38 @@
 PRINT_QUERIES = true
 
 class DBConnection
-  def self.open(db_file_name)
+  def self.open
+    reset! unless File.exist?(db_file_name)
+
     @db = SQLite3::Database.new(db_file_name)
+
     @db.results_as_hash = true
     @db.type_translation = true
 
     @db
   end
 
-  def self.reset
-    @sql_file ||= File.join(Gazebo::ROOT, 'db', 'gazebo_app_database.sql')
-    @db_file ||= File.join(Gazebo::ROOT, 'db', 'gazebo_app_database.db')
-
+  def self.reset!
     commands = [
-      "rm '#{@db_file}'",
-      "cat '#{@sql_file}' | sqlite3 '#{@db_file}'"
+      "rm '#{db_file_name}'",
+      "cat '#{sql_file_name}' | sqlite3 '#{db_file_name}'"
     ]
-
     commands.each { |command| `#{command}` }
-    DBConnection.open(@db_file)
   end
 
   def self.instance
-    reset if @db.nil?
+
+    open if @db.nil?
 
     @db
+  end
+
+  def self.sql_file_name
+    @sql_file ||= File.join(Gazebo::ROOT, 'db', 'gazebo_app_database.sql')
+  end
+
+  def self.db_file_name
+    @db_file ||= File.join(Gazebo::ROOT, 'db', 'gazebo_app_database.db')
   end
 
   def self.execute(*args)
