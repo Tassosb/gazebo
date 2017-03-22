@@ -30,8 +30,8 @@ module Searchable
       WHERE
         id = #{id}
     SQL
-
-    search_datum.nil? ? nil : self.new(search_datum)
+    raise RecordNotFound, "This record does not exist" if search_datum.nil?
+    self.new(search_datum)
   end
 
   def joins(association, _ = nil)
