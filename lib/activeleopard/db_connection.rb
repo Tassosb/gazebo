@@ -2,7 +2,7 @@ PRINT_QUERIES = true
 
 class DBConnection
   def self.open
-    reset! unless File.exist?(db_file_name)
+    create_database! unless File.exist?(db_file_name)
 
     @db = SQLite3::Database.new(db_file_name)
 
@@ -12,19 +12,22 @@ class DBConnection
     @db
   end
 
-  def self.reset!
-    commands = [
-      "rm '#{db_file_name}'",
-      "cat '#{sql_file_name}' | sqlite3 '#{db_file_name}'"
-    ]
-    commands.each { |command| `#{command}` }
+  def self.create_database!
+    `#{"cat '#{sql_file_name}' | sqlite3 '#{db_file_name}'"}`
   end
 
   def self.instance
-
     open if @db.nil?
 
     @db
+  end
+
+  def reset!
+    commands = [
+      "rm #{db_file_name}",
+      "cat '#{sql_file_name}' | sqlite3 '#{db_file_name}'"
+    ]
+    commands.each { |command| `#{command}` }
   end
 
   def self.sql_file_name
