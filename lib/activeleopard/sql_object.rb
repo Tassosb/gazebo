@@ -1,13 +1,13 @@
 class SQLObject
-
   def self.columns
     return @columns if @columns
 
-    cols = DBConnection.execute2(<<-SQL).first
+    cols = DBConnection.execute(<<-SQL).first.keys
       SELECT
         *
-      from
+      FROM
         #{self.table_name}
+      LIMIT 1
     SQL
 
     @columns = cols.map(&:to_sym)
@@ -108,7 +108,7 @@ class SQLObject
   end
 
   def insert
-    DBConnection.execute(<<-SQL, attr_values_to_update)
+    DBConnection.async_exec(<<-SQL, attr_values_to_update)
       INSERT INTO
         #{self.class.table_name} (#{col_names})
       VALUES
@@ -133,7 +133,8 @@ class SQLObject
   end
 
   def question_marks
-    (["?"] * (attributes.count - 1)).join(', ')
+    (1...attributes.count).map { |n| "$#{n}"}.join(', ')
+    # (["?"] * (attributes.count - 1)).join(', ')
   end
 
   def update_set_line
@@ -166,5 +167,9 @@ class SQLObject
   def valid?
     validate!
     errors.all? { |_, v| v.empty? }
+  end
+
+  def to_s
+    "#{self.class}:#{self.object_id}"
   end
 end

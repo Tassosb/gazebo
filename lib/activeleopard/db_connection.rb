@@ -21,12 +21,12 @@ class DBConnection
 
   def self.create_database!
     conn = PG::Connection.connect(dbname: 'postgres')
-    conn.exec("CREATE DATABASE #{db_name}")
+    conn.exec("CREATE DATABASE #{database_name}")
     # `#{"cat '#{sql_file_name}' | sqlite3 '#{db_file_name}'"}`
   end
 
-  def database_name
-    Gazebo::ROOT
+  def self.database_name
+    Gazebo::ROOT.split('/').last + '_development'
   end
 
   def self.instance
@@ -34,40 +34,40 @@ class DBConnection
 
     @db
   end
-
-  def reset!
-    commands = [
-      "rm #{db_file_name}",
-      "cat '#{sql_file_name}' | sqlite3 '#{db_file_name}'"
-    ]
-    commands.each { |command| `#{command}` }
-  end
-
-  def self.sql_file_name
-    @sql_file ||= File.join(Gazebo::ROOT, 'db', 'gazebo_app_database.sql')
-  end
-
-  def self.db_file_name
-    @db_file ||= File.join(Gazebo::ROOT, 'db', 'gazebo_app_database.db')
-  end
+  #
+  # def reset!
+  #   commands = [
+  #     "rm #{db_file_name}",
+  #     "cat '#{sql_file_name}' | sqlite3 '#{db_file_name}'"
+  #   ]
+  #   commands.each { |command| `#{command}` }
+  # end
+  #
+  # def self.sql_file_name
+  #   @sql_file ||= File.join(Gazebo::ROOT, 'db', 'gazebo_app_database.sql')
+  # end
+  #
+  # def self.db_file_name
+  #   @db_file ||= File.join(Gazebo::ROOT, 'db', 'gazebo_app_database.db')
+  # end
 
   def self.execute(*args)
     print_query(*args)
-    instance.execute(*args)
+    instance.exec(*args)
   end
 
-  def self.execute2(*args)
+  def self.async_exec(*args)
     print_query(*args)
-    instance.execute2(*args)
+    instance.send_query(*args)
   end
 
   def self.get_first_row(*args)
     print_query(*args)
-    instance.get_first_row(*args)
+    instance.exec(*args).first
   end
 
   def self.last_insert_row_id
-    instance.last_insert_row_id
+    instance.get_last_result(*args).first['id']
   end
 
   private

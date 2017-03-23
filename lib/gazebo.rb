@@ -31,6 +31,11 @@ module Gazebo
     )
   end
 
+  def self.seed!
+    seed_file_path = File.join(Gazebo::ROOT, "db", "seeds.rb")
+    $stdout.puts `ruby #{seed_file_path}`
+  end
+
   def self.root=(root)
     const_set("ROOT", root)
   end
