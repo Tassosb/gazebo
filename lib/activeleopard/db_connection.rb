@@ -2,18 +2,31 @@ PRINT_QUERIES = true
 
 class DBConnection
   def self.open
-    create_database! unless File.exist?(db_file_name)
+    # create_database! unless File.exist?(db_file_name)
 
-    @db = SQLite3::Database.new(db_file_name)
-
-    @db.results_as_hash = true
-    @db.type_translation = true
+    begin
+      @db = PG::Connection.open(dbname: self.database_name)
+    rescue PG::ConnectionBad => e
+      create_database!
+      retry
+    end
+    #
+    # @db = SQLite3::Database.new(db_file_name)
+    #
+    # @db.results_as_hash = true
+    # @db.type_translation = true
 
     @db
   end
 
   def self.create_database!
-    `#{"cat '#{sql_file_name}' | sqlite3 '#{db_file_name}'"}`
+    conn = PG::Connection.connect(dbname: 'postgres')
+    conn.exec("CREATE DATABASE #{db_name}")
+    # `#{"cat '#{sql_file_name}' | sqlite3 '#{db_file_name}'"}`
+  end
+
+  def database_name
+    Gazebo::ROOT
   end
 
   def self.instance
