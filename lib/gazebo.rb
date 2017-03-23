@@ -2,7 +2,7 @@ require 'byebug'
 require 'rack'
 
 require_relative 'activeleopard/activeleopard'
-require_relative 'activecondor/activecondor'
+require_relative 'actioncondor/actioncondor'
 require_relative 'static_asset_server'
 require_relative 'show_exceptions'
 require_relative 'auto_loader'

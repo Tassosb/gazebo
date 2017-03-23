@@ -10,8 +10,8 @@ require_relative 'controller_base'
 require_relative 'flash'
 require_relative 'session'
 
-class ActiveCondor
+class ActionCondor
 end
 
-class ActiveCondor::Base < ControllerBase
+class ActionCondor::Base < ControllerBase
 end
