@@ -2,15 +2,16 @@ class SQLObject
   def self.columns
     return @columns if @columns
 
-    cols = DBConnection.execute(<<-SQL).first.keys
+    cols = DBConnection.execute(<<-SQL, [self.table_name])
       SELECT
-        *
+        column_name
       FROM
-        #{self.table_name}
-      LIMIT 1
+        information_schema.columns
+      WHERE
+        table_name = $1
     SQL
-
-    @columns = cols.map(&:to_sym)
+    debugger
+    @columns = cols.map { |c| c['column_name'].to_sym }
   end
 
   def self.finalize!
