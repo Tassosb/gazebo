@@ -34,7 +34,7 @@ class WhereClause
       elsif condition.is_a?(Symbol)
         "#{condition} = ?"
       end
-    end.flatten.join(' AND ')
+    end.flatten.join(' AND ').gsub("?").with_index { |_, i| "$#{i + 1}" }
   end
 
   def parse_params(params_input)
@@ -54,7 +54,8 @@ class WhereClause
 
   def format_condition(condition, values)
     condition.gsub('(?)') do
-      "(#{(['?'] * values.count).join(', ')})"
+      "(#{values.map.with_index { |_, i| "$#{i + 1}" }})"
+      # "(#{(['?'] * values.count).join(', ')})"
     end
   end
 end

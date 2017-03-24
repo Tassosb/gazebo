@@ -7,8 +7,7 @@ module Searchable
         *
       FROM
         #{self.table_name}
-      WHERE
-        #{where_clause.as_sql}
+      #{where_clause.as_sql}
     SQL
 
     search_datum.nil? ? nil : self.new(search_datum)

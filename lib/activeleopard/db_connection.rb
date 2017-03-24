@@ -2,27 +2,73 @@ PRINT_QUERIES = true
 
 class DBConnection
   def self.open
-    # create_database! unless File.exist?(db_file_name)
-
     begin
       @db = PG::Connection.open(dbname: self.database_name)
     rescue PG::ConnectionBad => e
       create_database!
       retry
     end
-    #
-    # @db = SQLite3::Database.new(db_file_name)
-    #
-    # @db.results_as_hash = true
-    # @db.type_translation = true
+
+    ensure_migrations_table
+    run_migrations!
 
     @db
   end
 
+  def self.ensure_migrations_table
+    begin
+      @db.exec("SELECT * FROM migrations")
+    rescue PG::UndefinedTable
+      @db.exec(<<-SQL)
+        CREATE TABLE MIGRATIONS(
+          ID SERIAL PRIMARY KEY NOT NULL,
+          NAME CHAR(50) NOT NULL,
+          CREATED_AT CHAR(50) NOT NULL
+        )
+      SQL
+    end
+  end
+
+  def self.run_migrations!
+    Dir.foreach("db/migrations") do |file_name|
+      migration_name = file_name.match(/\w+/).to_s
+
+      next if migration_name.empty? || already_run?(migration_name)
+
+      file = File.join(Gazebo::ROOT, "db/migrations", file_name)
+      migration_sql = File.read(file)
+
+      @db.exec(migration_sql)
+
+      record_migration!(migration_name)
+    end
+  end
+
+  def self.record_migration!(migration_name)
+    time = Time.new.strftime("%Y%m%dT%H%M")
+    here_doc = <<-SQL
+      INSERT INTO
+        migrations (name, created_at)
+      VALUES
+       ($1, $2)
+    SQL
+    debugger
+    @db.exec(here_doc, [migration_name, time])
+  end
+
+  def self.already_run?(migration_name)
+    res = @db.exec(<<-SQL, [migration_name]).first
+      SELECT *
+      FROM migrations
+      WHERE name = $1
+    SQL
+
+    !!res
+  end
+
   def self.create_database!
-    conn = PG::Connection.connect(dbname: 'postgres')
-    conn.exec("CREATE DATABASE #{database_name}")
-    # `#{"cat '#{sql_file_name}' | sqlite3 '#{db_file_name}'"}`
+    master_conn = PG::Connection.connect(dbname: 'postgres')
+    master_conn.exec("CREATE DATABASE #{database_name}")
   end
 
   def self.database_name
@@ -34,22 +80,6 @@ class DBConnection
 
     @db
   end
-  #
-  # def reset!
-  #   commands = [
-  #     "rm #{db_file_name}",
-  #     "cat '#{sql_file_name}' | sqlite3 '#{db_file_name}'"
-  #   ]
-  #   commands.each { |command| `#{command}` }
-  # end
-  #
-  # def self.sql_file_name
-  #   @sql_file ||= File.join(Gazebo::ROOT, 'db', 'gazebo_app_database.sql')
-  # end
-  #
-  # def self.db_file_name
-  #   @db_file ||= File.join(Gazebo::ROOT, 'db', 'gazebo_app_database.db')
-  # end
 
   def self.execute(*args)
     print_query(*args)
@@ -67,7 +97,7 @@ class DBConnection
   end
 
   def self.last_insert_row_id
-    instance.get_last_result(*args).first['id']
+    instance.get_last_result.first['id']
   end
 
   private

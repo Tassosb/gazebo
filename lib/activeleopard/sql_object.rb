@@ -138,7 +138,7 @@ class SQLObject
   end
 
   def update_set_line
-    col_names.split(', ').map { |c| "#{c} = ?" }.join(', ')
+    col_names.split(', ').map.with_index { |c, i| "#{c} = $#{i + 1}" }.join(', ')
   end
 
   def update
@@ -148,7 +148,7 @@ class SQLObject
       SET
         #{update_set_line}
       WHERE
-        id = ?
+        id = $#{col_names.count + 1}
     SQL
   end
 
