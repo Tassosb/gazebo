@@ -20,6 +20,7 @@ class SessionsController < ApplicationController
   end
 
   def log_in!(user)
+    debugger
     session[:session_token] = user.reset_session_token!
   end
 end

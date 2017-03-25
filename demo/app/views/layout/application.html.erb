@@ -7,6 +7,11 @@
   <body>
     <h1>Application!</h1>
 
+    <% if current_user %>
+      <h2>Hey <%= current_user.username %>!</h2>
+    <% end %>
+    <%= "Hi" + current_user.to_s %>
+
     __YIELD__
 
   </body>
