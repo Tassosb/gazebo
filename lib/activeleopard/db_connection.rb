@@ -52,7 +52,7 @@ class DBConnection
       VALUES
        ($1, $2)
     SQL
-    debugger
+    # debugger
     @db.exec(here_doc, [migration_name, time])
   end
 

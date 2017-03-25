@@ -12,6 +12,8 @@ module Gazebo
   Router = Router.new
 
   def self.boot
+    seed! if ARGV[0] == 'seed'
+
     app = Proc.new do |env|
       req = Rack::Request.new(env)
       res = Rack::Response.new
@@ -33,5 +35,13 @@ module Gazebo
 
   def self.root=(root)
     const_set("ROOT", root)
+  end
+
+  def self.seed!
+    file = File.join(ROOT, "db/seeds.rb")
+    
+    File.open(file) do |f|
+      self.class_eval(f.read)
+    end
   end
 end

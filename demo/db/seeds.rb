@@ -1,3 +1,7 @@
+
+Human.destroy_all
+Cat.destroy_all
+
 names = "Werner Gapinski  
 Georgianna Bonner  
 Trudi Nesbitt  
@@ -22,6 +26,7 @@ Edgar Casias".split(/\n/).map { |name| name.split(' ') }
 humans = names.map do |fname, lname|
   h = Human.new(fname: fname, lname: lname)
   h.save
+  h
 end
 
 human_ids = humans.map(&:id)
@@ -47,3 +52,5 @@ cats.each do |cat|
   c = Cat.new(name: cat, owner_id: human_ids.sample)
   c.save
 end
+
+Cat.first.destroy

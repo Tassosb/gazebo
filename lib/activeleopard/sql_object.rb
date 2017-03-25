@@ -1,4 +1,8 @@
 class SQLObject
+  def self.all
+    Relation.new({}, self)
+  end
+
   def self.columns
     return @columns if @columns
 
@@ -10,8 +14,14 @@ class SQLObject
       WHERE
         table_name = $1
     SQL
-    debugger
+
     @columns = cols.map { |c| c['column_name'].to_sym }
+  end
+
+  def self.destroy_all
+    DBConnection.execute(<<-SQL)
+    DELETE FROM #{self.table_name}
+    SQL
   end
 
   def self.finalize!
@@ -26,6 +36,40 @@ class SQLObject
     end
   end
 
+  def self.first
+    first_data = DBConnection.get_first_row(<<-SQL)
+    SELECT
+    *
+    FROM
+    #{self.table_name}
+    ORDER BY
+    id
+    LIMIT
+    1
+    SQL
+
+    self.new(first_data)
+  end
+
+  def self.last
+    last_data = DBConnection.get_first_row(<<-SQL)
+    SELECT
+    *
+    FROM
+    #{self.table_name}
+    ORDER BY
+    id DESC
+    LIMIT
+    1
+    SQL
+
+    self.new(last_data)
+  end
+
+  def self.parse_all(all_options)
+    all_options.map { |options| self.new(options) }
+  end
+
   def self.table_name=(table_name)
     @table_name = table_name
   end
@@ -34,46 +78,37 @@ class SQLObject
     @table_name ||= self.to_s.tableize.gsub('humen') { 'humans' }
   end
 
-  def self.all
-    Relation.new({}, self)
-  end
-
-  def self.parse_all(all_options)
-    all_options.map { |options| self.new(options) }
-  end
-
-  def self.first
-    first_data = DBConnection.get_first_row(<<-SQL)
-      SELECT
-        *
-      FROM
-        #{self.table_name}
-      ORDER BY
-        id
-      LIMIT
-        1
-    SQL
-
-    self.new(first_data)
-  end
-
-  def self.last
-    last_data = DBConnection.get_first_row(<<-SQL)
-      SELECT
-        *
-      FROM
-        #{self.table_name}
-      ORDER BY
-        id DESC
-      LIMIT
-        1
-    SQL
-
-    self.new(last_data)
-  end
-
   def self.validations
     @validations ||= []
+  end
+
+  def attributes
+    @attributes ||= {}
+  end
+
+  def attr_count
+    @attributes.count
+  end
+
+  def attribute_values
+    attributes.values
+  end
+
+  def attr_values_to_update
+    attributes.reject { |attr_name, _| attr_name == :id }.values
+  end
+
+  def col_names
+    self.class.columns
+    .map(&:to_s)
+    .drop(1).join(', ')
+  end
+
+  def destroy
+    DBConnection.execute(<<-SQL, [self.id])
+    DELETE FROM #{self.class.table_name}
+    WHERE id = $1
+    SQL
   end
 
   def initialize(params = {})
@@ -81,6 +116,19 @@ class SQLObject
       params_val = params[attr_name] || params[attr_name.to_s]
       send("#{attr_name}=", params_val)
     end
+  end
+
+  def insert
+    result = DBConnection.execute(<<-SQL, attr_values_to_update)
+    INSERT INTO
+    #{self.class.table_name} (#{col_names})
+    VALUES
+    (#{question_marks})
+    RETURNING
+    id
+    SQL
+
+    self.id = result.getvalue(0,0)
   end
 
   def save
@@ -98,39 +146,6 @@ class SQLObject
     errors.each do |key, messages|
       messages.each { |m| puts "#{key} #{m}" }
     end
-  end
-
-  def attributes
-    @attributes ||= {}
-  end
-
-  def attribute_values
-    attributes.values
-  end
-
-  def insert
-    DBConnection.async_exec(<<-SQL, attr_values_to_update)
-      INSERT INTO
-        #{self.class.table_name} (#{col_names})
-      VALUES
-        (#{question_marks})
-    SQL
-
-    self.id = DBConnection.last_insert_row_id
-  end
-
-  def col_names
-    self.class.columns
-      .map(&:to_s)
-      .drop(1).join(', ')
-  end
-
-  def attr_count
-    @attributes.count
-  end
-
-  def attr_values_to_update
-    attributes.reject { |attr_name, _| attr_name == :id }.values
   end
 
   def question_marks

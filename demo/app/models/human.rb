@@ -4,4 +4,8 @@ class Human < ActiveLeopard::Base
   belongs_to :house, :foreign_key => :house_id
 
   finalize!
+
+  def name
+    "#{fname.capitalize} #{lname.capitalize}"
+  end
 end

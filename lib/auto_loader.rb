@@ -17,7 +17,8 @@ class Object
 
       begin
         require_relative(file)
-      rescue LoadError
+        return
+      rescue LoadError => e
       end
     end
   end
