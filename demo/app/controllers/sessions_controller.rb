@@ -15,6 +15,9 @@ class SessionsController < ApplicationController
       redirect_to("http://localhost:3000/cats")
     else
       flash[:errors] = ["Invalid Credentials"]
+      @user = User.new(
+        username: params['user']['username']
+      )
       render :new
     end
   end

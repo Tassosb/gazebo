@@ -12,6 +12,14 @@
     <% end %>
     <%= "Hi" + current_user.to_s %>
 
+    <% if flash[:errors] %>
+      <ul>
+        <% flash[:errors].each do |error| %>
+          <li><%= error %></li>
+        <% end %>
+      </ul>
+    <% end %>
+
     __YIELD__
 
   </body>
