@@ -1,6 +1,14 @@
 class SQLObject
+  def self.after_initialize(method_name)
+    callbacks[:after_initialize] = method_name
+  end
+
   def self.all
     Relation.new({}, self)
+  end
+
+  def self.callbacks
+    @callbacks ||= {}
   end
 
   def self.columns
@@ -118,7 +126,18 @@ class SQLObject
   def initialize(params = {})
     self.class.columns.each do |attr_name|
       params_val = params[attr_name] || params[attr_name.to_s]
+      params_val.strip! if params_val
       send("#{attr_name}=", params_val)
+    end
+
+    params.each do |attr_name, val|
+      next if self.class.columns.include?(attr_name.to_sym)
+      val.strip! if val
+      send("#{attr_name}=", val)
+    end
+
+    if self.class.callbacks[:after_initialize]
+      send(self.class.callbacks[:after_initialize])
     end
   end
 
@@ -165,13 +184,14 @@ class SQLObject
   end
 
   def update
-    DBConnection.execute(<<-SQL, (attr_values_to_update << id))
+    vals = attr_values_to_update << id
+    DBConnection.execute(<<-SQL, vals)
       UPDATE
         #{self.class.table_name}
       SET
         #{update_set_line}
       WHERE
-        id = $#{col_names.count + 1}
+        id = $#{vals.length}
     SQL
   end
 
