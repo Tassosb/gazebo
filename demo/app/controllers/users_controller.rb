@@ -1,4 +1,4 @@
-class UsersController < ActionCondor::Base
+class UsersController < ApplicationController
   def new
     @user = User.new
     render :new

@@ -1,4 +1,4 @@
-class HumansController < ActionCondor::Base
+class HumansController < ApplicationController
   def index
     @humans = Human.all
     render :index
