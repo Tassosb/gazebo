@@ -20,7 +20,7 @@ class SQLObject
 
   def self.destroy_all
     DBConnection.execute(<<-SQL)
-    DELETE FROM #{self.table_name}
+      DELETE FROM #{self.table_name}
     SQL
   end
 
@@ -39,13 +39,13 @@ class SQLObject
   def self.first
     first_data = DBConnection.get_first_row(<<-SQL)
     SELECT
-    *
+      *
     FROM
-    #{self.table_name}
+      #{self.table_name}
     ORDER BY
-    id
+      id
     LIMIT
-    1
+      1
     SQL
 
     self.new(first_data)
@@ -54,13 +54,13 @@ class SQLObject
   def self.last
     last_data = DBConnection.get_first_row(<<-SQL)
     SELECT
-    *
+      *
     FROM
-    #{self.table_name}
+      #{self.table_name}
     ORDER BY
-    id DESC
+      id DESC
     LIMIT
-    1
+      1
     SQL
 
     self.new(last_data)
@@ -106,9 +106,13 @@ class SQLObject
 
   def destroy
     DBConnection.execute(<<-SQL, [self.id])
-    DELETE FROM #{self.class.table_name}
-    WHERE id = $1
+      DELETE FROM #{self.class.table_name}
+      WHERE id = $1
     SQL
+  end
+
+  def errors
+    @errors ||= Hash.new { |h, k| h[k] = [] }
   end
 
   def initialize(params = {})
@@ -121,14 +125,18 @@ class SQLObject
   def insert
     result = DBConnection.execute(<<-SQL, attr_values_to_update)
     INSERT INTO
-    #{self.class.table_name} (#{col_names})
+      #{self.class.table_name} (#{col_names})
     VALUES
-    (#{question_marks})
+      (#{question_marks})
     RETURNING
-    id
+      id
     SQL
 
     self.id = result.getvalue(0,0)
+  end
+
+  def question_marks
+    (1...attributes.count).map { |n| "$#{n}"}.join(', ')
   end
 
   def save
@@ -148,9 +156,8 @@ class SQLObject
     end
   end
 
-  def question_marks
-    (1...attributes.count).map { |n| "$#{n}"}.join(', ')
-    # (["?"] * (attributes.count - 1)).join(', ')
+  def to_s
+    "#{self.class}:#{self.object_id}"
   end
 
   def update_set_line
@@ -168,10 +175,6 @@ class SQLObject
     SQL
   end
 
-  def errors
-    @errors ||= Hash.new { |h, k| h[k] = [] }
-  end
-
   def validate!
     @errors = Hash.new { |h, k| h[k] = [] }
 
@@ -183,9 +186,5 @@ class SQLObject
   def valid?
     validate!
     errors.all? { |_, v| v.empty? }
-  end
-
-  def to_s
-    "#{self.class}:#{self.object_id}"
   end
 end
