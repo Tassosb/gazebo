@@ -4,7 +4,7 @@ class CatsController < ApplicationController
   end
 
   def index
-    @cats = Cat.all
+    @cats = Cat.order(:name).limit(10)
     render :index
   end
 

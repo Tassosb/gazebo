@@ -1,5 +1,6 @@
 class SessionsController < ApplicationController
   def new
+    @hide_log_in_link = true
     @user = User.new
     render :new
   end
