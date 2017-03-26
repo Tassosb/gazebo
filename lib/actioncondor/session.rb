@@ -4,7 +4,7 @@ class Session
   attr_reader :cookie
 
   def initialize(req)
-    app_cookie = req.cookies['_rails_lite_app']
+    app_cookie = req.cookies['_gazebo_app']
 
     @cookie = app_cookie ? JSON.parse(app_cookie) : {}
   end
@@ -21,7 +21,7 @@ class Session
   # add to the responses cookies
   def store_session(res)
     res.set_cookie(
-      '_rails_lite_app',
+      '_gazebo_app',
       path: '/',
       value: @cookie.to_json
     )

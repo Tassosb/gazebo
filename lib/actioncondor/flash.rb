@@ -2,7 +2,7 @@ class Flash
   def initialize(req)
     @flash = {}
 
-    app_cookie = req.cookies['_rails_lite_app_flash']
+    app_cookie = req.cookies['_gazebo_app_flash']
 
     @flash_now = app_cookie ? JSON.parse(app_cookie) : {}
   end
@@ -23,7 +23,7 @@ class Flash
   # add to the responses cookies
   def store_flash(res)
     res.set_cookie(
-      '_rails_lite_app_flash',
+      '_gazebo_app_flash',
       path: '/',
       value: @flash.to_json
     )
