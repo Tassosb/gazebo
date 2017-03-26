@@ -9,8 +9,11 @@
 
     <% if current_user %>
       <h2>Hey <%= current_user.username %>!</h2>
+      <form action="/session" method="post">
+        <input type="hidden" name="_method" value="delete">
+        <input type="submit" value="Log Out">
+      </form>
     <% end %>
-    <%= "Hi" + current_user.to_s %>
 
     <% if flash[:errors] %>
       <ul>

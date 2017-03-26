@@ -12,7 +12,7 @@ class SessionsController < ApplicationController
 
     if @user
       log_in!(@user)
-      redirect_to("http://localhost:3000/cats")
+      redirect_to("/cats")
     else
       flash[:errors] = ["Invalid Credentials"]
       @user = User.new(
@@ -22,8 +22,13 @@ class SessionsController < ApplicationController
     end
   end
 
+  def destroy
+    current_user.reset_session_token!
+    session[:session_token] = nil
+    redirect_to "/session/new"
+  end
+
   def log_in!(user)
-    debugger
     session[:session_token] = user.reset_session_token!
   end
 end

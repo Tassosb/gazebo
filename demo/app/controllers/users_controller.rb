@@ -7,7 +7,7 @@ class UsersController < ApplicationController
   def create
     @user = User.new(params['user'])
     if @user.save
-      redirect_to("http://localhost:3000/cats")
+      redirect_to("/cats")
     else
       flash[:errors] = @user.errors
       render :new
