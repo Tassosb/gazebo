@@ -12,7 +12,7 @@ class Route
   def matches?(req)
     return false if (pattern =~ req.path).nil?
 
-    # check if form is providing non-gets/post method
+    # check if form is providing non-get/post method
     req_method = req.params["_method"] || req.request_method
 
     req_method.upcase == http_method.to_s.upcase
