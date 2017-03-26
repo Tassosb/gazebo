@@ -11,7 +11,11 @@ class Route
   # checks if pattern matches path and method matches request method
   def matches?(req)
     return false if (pattern =~ req.path).nil?
-    req.request_method == http_method.to_s.upcase
+
+    # check if form is providing non-gets/post method
+    req_method = req.params["_method"] || req.request_method
+
+    req_method.upcase == http_method.to_s.upcase
   end
 
   # use pattern to pull out route params (save for later?)
@@ -63,6 +67,8 @@ class Router
   # either throw 404 or call run on a matched route
   def run(req, res)
     matched_route = match(req)
+    puts req.params
+    matched_route.http_method
 
     if matched_route
       res.status = 200
