@@ -16,7 +16,7 @@ class Relation
   end
 
   def self.ordered_clauses
-    [:select, :from, :join, :where, :limit, :group, :order]
+    [:select, :from, :join, :where, :group, :order, :limit]
   end
 
   def initialize(query, source_class)

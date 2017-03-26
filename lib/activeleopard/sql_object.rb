@@ -131,9 +131,12 @@ class SQLObject
     end
 
     params.each do |attr_name, val|
+      attr_method = "#{attr_name}="
       next if self.class.columns.include?(attr_name.to_sym)
+      next unless self.respond_to?(attr_method)
+
       val.strip! if val
-      send("#{attr_name}=", val)
+      send(attr_method, val)
     end
 
     if self.class.callbacks[:after_initialize]
