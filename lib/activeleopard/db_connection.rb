@@ -52,7 +52,7 @@ class DBConnection
       VALUES
        ($1, $2)
     SQL
-    # debugger
+
     @db.exec(here_doc, [migration_name, time])
   end
 
@@ -94,10 +94,6 @@ class DBConnection
   def self.get_first_row(*args)
     print_query(*args)
     instance.exec(*args).first
-  end
-
-  def self.last_insert_row_id
-    instance.get_last_result.first['id']
   end
 
   private
