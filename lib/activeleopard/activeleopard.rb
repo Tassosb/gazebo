@@ -1,6 +1,5 @@
 require 'active_support/inflector'
 require 'colorize'
-require 'sqlite3'
 require 'pg'
 
 require_relative 'query_clauses/all_clauses'
