@@ -5,6 +5,5 @@ gem 'rack'
 
 gem 'activesupport'
 gem 'colorize'
-gem 'sqlite3'
 gem 'byebug'
 gem 'pg'
