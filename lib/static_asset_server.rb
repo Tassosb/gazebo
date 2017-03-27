@@ -3,7 +3,7 @@ class StaticAssetServer
 
   def initialize(app)
     @app = app
-    @root = 'demo/app/assets/'
+    @root = 'app/assets/'
     @file_server = FileServer.new
   end
 

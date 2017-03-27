@@ -95,7 +95,7 @@ class DBConnection
   end
 
   def self.database_name
-    Gazebo::ROOT.split('/').last + '_development'
+    Gazebo::ROOT.split('/').last.gsub("-", "_") + '_development'
   end
 
   def self.instance

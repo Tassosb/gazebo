@@ -11,6 +11,7 @@ require_relative 'router'
 
 module Gazebo
   Router = Router.new
+  VERSION = "0.0.0"
 
   def self.boot
     seed! if ARGV[0] == 'seed'

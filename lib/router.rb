@@ -67,8 +67,6 @@ class Router
   # either throw 404 or call run on a matched route
   def run(req, res)
     matched_route = match(req)
-    puts req.params
-    matched_route.http_method
 
     if matched_route
       res.status = 200
