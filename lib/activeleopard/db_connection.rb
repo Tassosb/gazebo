@@ -2,6 +2,26 @@ PRINT_QUERIES = true
 
 class DBConnection
   def self.open
+    if ENV['DATABASE_URL']
+      self.open_production
+    else
+      self.open_development
+    end
+  end
+
+  def self.open_production
+    uri = ENV['DATABASE_URL']
+
+    @db = PG::Connection.new(
+      user: uri.user,
+      password: uri.password,
+      host: uri.host,
+      port: uri.port,
+      dbname: uri.path[1..-1]
+    )
+  end
+
+  def self.open_development
     begin
       @db = PG::Connection.open(dbname: self.database_name)
     rescue PG::ConnectionBad => e
@@ -30,7 +50,10 @@ class DBConnection
   end
 
   def self.run_migrations!
-    Dir.foreach("db/migrations") do |file_name|
+    migrations = Dir.entries("db/migrations").reject { |fname| fname.start_with?('.') }
+    migrations.sort_by! { |fname| Integer(fname[0..1]) }
+
+    migrations.each do |file_name|
       migration_name = file_name.match(/\w+/).to_s
 
       next if migration_name.empty? || already_run?(migration_name)
