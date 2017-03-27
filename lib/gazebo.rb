@@ -1,5 +1,6 @@
 require 'byebug'
 require 'rack'
+require 'uri'
 
 require_relative 'activeleopard/activeleopard'
 require_relative 'actioncondor/actioncondor'
