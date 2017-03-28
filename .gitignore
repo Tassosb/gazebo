@@ -1,3 +1,5 @@
 DS_Store
 .byebug_history
+Gemfile.lock
+gazebo-*.gem
 gazebo_app_database.db
