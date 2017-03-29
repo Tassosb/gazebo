@@ -11,7 +11,7 @@ require_relative 'router'
 
 module Gazebo
   Router = Router.new
-  VERSION = "0.0.1"
+  VERSION = "0.0.3"
 
   def self.app
     fetch_routes!
@@ -28,8 +28,6 @@ module Gazebo
       use StaticAssetServer
       run app
     end.to_app
-
-    run app
   end
 
   def self.root=(root)
