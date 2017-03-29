@@ -25,16 +25,11 @@ module Gazebo
       res
     end
 
-    app = Rack::Builder.new do
+    Rack::Builder.new do
       use ShowExceptions
       use StaticAssetServer
       run app
-    end.to_app
-
-    Rack::Server.start(
-     app: app,
-     Port: 3000
-    )
+    end
   end
 
   def self.root=(root)
