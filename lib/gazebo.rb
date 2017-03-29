@@ -14,8 +14,6 @@ module Gazebo
   VERSION = "0.0.1"
 
   def self.boot
-    seed! if ARGV[0] == 'seed'
-
     fetch_routes!
 
     app = Proc.new do |env|
