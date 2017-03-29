@@ -13,7 +13,7 @@ module Gazebo
   Router = Router.new
   VERSION = "0.0.1"
 
-  def self.boot
+  def self.app
     fetch_routes!
 
     app = Proc.new do |env|
@@ -23,11 +23,13 @@ module Gazebo
       res
     end
 
-    Rack::Builder.new do
+    app = Rack::Builder.new do
       use ShowExceptions
       use StaticAssetServer
       run app
-    end
+    end.to_app
+
+    run app
   end
 
   def self.root=(root)
