@@ -8,12 +8,12 @@ Gem::Specification.new do |s|
   s.description = "A lightweight MVC framework"
   s.authors     = ["Tassos Bareiss"]
   s.email       = 'tassosbareiss@gmail.com'
-  s.homepage    = 'http://github/tassosb/gazebo.git'
+  s.homepage    = 'https://github.com/Tassosb/gazebo'
   s.files       = Dir["README.md", "lib/**/*"]
   s.license       = 'MIT'
 
-  s.add_dependency 'activesupport'
-  s.add_dependency 'pg'
-  s.add_dependency 'rack'
-  s.add_dependency 'colorize'
+  s.add_dependency 'activesupport', '~> 5.0'
+  s.add_dependency 'pg', '~> 0.18.4'
+  s.add_dependency 'rack', '~> 1.6', '>= 1.6.4'
+  s.add_dependency 'colorize', '~> 0.8.1'
 end
