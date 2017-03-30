@@ -29,13 +29,10 @@ class DBConnection
       retry
     end
 
-    ensure_migrations_table
-    run_migrations!
-
     @db
   end
 
-  def self.ensure_migrations_table
+  def self.ensure_migrations_table!
     begin
       @db.exec("SELECT * FROM migrations")
     rescue PG::UndefinedTable
@@ -49,7 +46,13 @@ class DBConnection
     end
   end
 
-  def self.run_migrations!
+  def migrate
+    self.open
+    ensure_migrations_table!
+    run_migrations
+  end
+
+  def self.run_migrations
     migrations = Dir.entries("db/migrations").reject { |fname| fname.start_with?('.') }
     migrations.sort_by! { |fname| Integer(fname[0..1]) }
 

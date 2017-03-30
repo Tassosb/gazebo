@@ -10,7 +10,8 @@ Gem::Specification.new do |s|
   s.email       = 'tassosbareiss@gmail.com'
   s.homepage    = 'https://github.com/Tassosb/gazebo'
   s.files       = Dir["README.md", "lib/**/*"]
-  s.license       = 'MIT'
+  s.license     = 'MIT'
+  s.executables << 'migrate'
 
   s.add_development_dependency "bundler", "~> 1.13"
   s.add_development_dependency "rake", "~> 10.0"
