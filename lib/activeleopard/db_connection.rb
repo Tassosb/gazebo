@@ -8,6 +8,7 @@ class DBConnection
     else
       self.open_development
     end
+    run_migrations
   end
 
   def self.open_production
