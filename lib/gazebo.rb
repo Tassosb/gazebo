@@ -11,11 +11,9 @@ require_relative 'router'
 
 module Gazebo
   Router = Router.new
-  VERSION = "0.0.2"
+  VERSION = "0.1.1"
 
-  def self.boot
-    seed! if ARGV[0] == 'seed'
-
+  def self.app
     fetch_routes!
 
     app = Proc.new do |env|
@@ -25,11 +23,11 @@ module Gazebo
       res
     end
 
-    Rack::Builder.new do
+    app = Rack::Builder.new do
       use ShowExceptions
       use StaticAssetServer
       run app
-    end
+    end.to_app
   end
 
   def self.root=(root)
@@ -50,5 +48,9 @@ module Gazebo
     File.open(file) do |f|
       self.class_eval(f.read)
     end
+  end
+
+  def self.migrate
+    DBConnection.run_migrations
   end
 end
