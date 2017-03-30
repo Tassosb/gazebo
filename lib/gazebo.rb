@@ -11,7 +11,7 @@ require_relative 'router'
 
 module Gazebo
   Router = Router.new
-  VERSION = "0.0.7"
+  VERSION = "0.0.9"
 
   def self.app
     fetch_routes!
@@ -50,7 +50,7 @@ module Gazebo
     end
   end
 
-  def migrate
+  def self.migrate
     DBConnection.run_migrations
   end
 end
