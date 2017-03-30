@@ -10,7 +10,7 @@ class DBConnection
   end
 
   def self.open_production
-    uri = ENV['DATABASE_URL']
+    uri = URI.parse(ENV['DATABASE_URL'])
 
     @db = PG::Connection.new(
       user: uri.user,
