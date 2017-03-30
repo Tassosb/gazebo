@@ -34,9 +34,9 @@ class DBConnection
 
   def self.ensure_migrations_table!
     begin
-      @db.exec("SELECT * FROM migrations")
+      instance.exec("SELECT * FROM migrations")
     rescue PG::UndefinedTable
-      @db.exec(<<-SQL)
+      instance.exec(<<-SQL)
         CREATE TABLE MIGRATIONS(
           ID SERIAL PRIMARY KEY NOT NULL,
           NAME CHAR(50) NOT NULL,
@@ -46,13 +46,8 @@ class DBConnection
     end
   end
 
-  def self.migrate
-    self.open
-    ensure_migrations_table!
-    run_migrations
-  end
-
   def self.run_migrations
+    ensure_migrations_table!
     migrations = Dir.entries("db/migrations").reject { |fname| fname.start_with?('.') }
     migrations.sort_by! { |fname| Integer(fname[0..1]) }
 
@@ -64,7 +59,7 @@ class DBConnection
       file = File.join(Gazebo::ROOT, "db/migrations", file_name)
       migration_sql = File.read(file)
 
-      @db.exec(migration_sql)
+      instance.exec(migration_sql)
 
       record_migration!(migration_name)
     end

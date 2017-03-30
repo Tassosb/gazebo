@@ -1,4 +1,4 @@
 #!/usr/bin/env ruby
 
 require 'gazebo'
-DBConnection.migrate
+Gazebo.migrate

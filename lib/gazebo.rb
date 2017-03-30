@@ -49,4 +49,8 @@ module Gazebo
       self.class_eval(f.read)
     end
   end
+
+  def migrate
+    DBConnection.run_migrations
+  end
 end
