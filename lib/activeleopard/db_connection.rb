@@ -46,7 +46,7 @@ class DBConnection
     end
   end
 
-  def migrate
+  def self.migrate
     self.open
     ensure_migrations_table!
     run_migrations

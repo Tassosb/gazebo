@@ -11,7 +11,7 @@ require_relative 'router'
 
 module Gazebo
   Router = Router.new
-  VERSION = "0.0.5"
+  VERSION = "0.0.7"
 
   def self.app
     fetch_routes!
