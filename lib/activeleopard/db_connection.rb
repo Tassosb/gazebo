@@ -1,3 +1,4 @@
+require 'pg'
 PRINT_QUERIES = true
 
 class DBConnection
