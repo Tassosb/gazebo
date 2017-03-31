@@ -2,11 +2,55 @@ require 'pg'
 PRINT_QUERIES = true
 
 class DBConnection
+  def self.instance
+    open if @db.nil?
+
+    @db
+  end
+
+  def self.execute(*args)
+    print_query(*args)
+    instance.exec(*args)
+  end
+
+  def self.async_exec(*args)
+    print_query(*args)
+    instance.send_query(*args)
+  end
+
+  def self.get_first_row(*args)
+    print_query(*args)
+    instance.exec(*args).first
+  end
+
+  def self.run_migrations
+    ensure_migrations_table!
+    migrations = Dir.entries("db/migrations").reject { |fname| fname.start_with?('.') }
+    migrations.sort_by! { |fname| Integer(fname[0..1]) }
+
+    migrations.each do |file_name|
+      migration_name = file_name.match(/\w+/).to_s
+
+      next if migration_name.empty? || already_run?(migration_name)
+
+      file = File.join(Gazebo::ROOT, "db/migrations", file_name)
+      migration_sql = File.read(file)
+      execute(migration_sql)
+
+      record_migration!(migration_name)
+    end
+  end
+
+  private
+  def self.database_name
+    Gazebo::ROOT.split('/').last.gsub("-", "_") + '_development'
+  end
+
   def self.open
     if ENV['DATABASE_URL']
-      self.open_production
+      open_production
     else
-      self.open_development
+      open_development
     end
     run_migrations
   end
@@ -48,25 +92,6 @@ class DBConnection
     end
   end
 
-  def self.run_migrations
-    ensure_migrations_table!
-    migrations = Dir.entries("db/migrations").reject { |fname| fname.start_with?('.') }
-    migrations.sort_by! { |fname| Integer(fname[0..1]) }
-
-    migrations.each do |file_name|
-      migration_name = file_name.match(/\w+/).to_s
-
-      next if migration_name.empty? || already_run?(migration_name)
-
-      file = File.join(Gazebo::ROOT, "db/migrations", file_name)
-      migration_sql = File.read(file)
-
-      execute(migration_sql)
-
-      record_migration!(migration_name)
-    end
-  end
-
   def self.record_migration!(migration_name)
     time = Time.new.strftime("%Y%m%dT%H%M")
     here_doc = <<-SQL
@@ -81,9 +106,9 @@ class DBConnection
 
   def self.already_run?(migration_name)
     !!execute(<<-SQL, [migration_name]).first
-      SELECT *
-      FROM migrations
-      WHERE name = $1
+    SELECT *
+    FROM migrations
+    WHERE name = $1
     SQL
   end
 
@@ -91,33 +116,6 @@ class DBConnection
     master_conn = PG::Connection.connect(dbname: 'postgres')
     master_conn.exec("CREATE DATABASE #{database_name}")
   end
-
-  def self.database_name
-    Gazebo::ROOT.split('/').last.gsub("-", "_") + '_development'
-  end
-
-  def self.instance
-    open if @db.nil?
-
-    @db
-  end
-
-  def self.execute(*args)
-    print_query(*args)
-    instance.exec(*args)
-  end
-
-  def self.async_exec(*args)
-    print_query(*args)
-    instance.send_query(*args)
-  end
-
-  def self.get_first_row(*args)
-    print_query(*args)
-    instance.exec(*args).first
-  end
-
-  private
 
   def self.random_color
     [:blue, :light_blue, :red, :green, :yellow].sample
