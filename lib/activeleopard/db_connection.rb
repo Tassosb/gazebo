@@ -36,9 +36,9 @@ class DBConnection
 
   def self.ensure_migrations_table!
     begin
-      instance.exec("SELECT * FROM migrations")
+      execute("SELECT * FROM migrations")
     rescue PG::UndefinedTable
-      instance.exec(<<-SQL)
+      execute(<<-SQL)
         CREATE TABLE MIGRATIONS(
           ID SERIAL PRIMARY KEY NOT NULL,
           NAME CHAR(50) NOT NULL,
@@ -61,7 +61,7 @@ class DBConnection
       file = File.join(Gazebo::ROOT, "db/migrations", file_name)
       migration_sql = File.read(file)
 
-      instance.exec(migration_sql)
+      execute(migration_sql)
 
       record_migration!(migration_name)
     end
@@ -76,17 +76,15 @@ class DBConnection
        ($1, $2)
     SQL
 
-    @db.exec(here_doc, [migration_name, time])
+    execute(here_doc, [migration_name, time])
   end
 
   def self.already_run?(migration_name)
-    res = @db.exec(<<-SQL, [migration_name]).first
+    !!execute(<<-SQL, [migration_name]).first
       SELECT *
       FROM migrations
       WHERE name = $1
     SQL
-
-    !!res
   end
 
   def self.create_database!
