@@ -11,13 +11,14 @@ Gem::Specification.new do |s|
   s.homepage    = 'https://github.com/Tassosb/gazebo'
   s.files       = Dir["README.md", "lib/**/*"]
   s.license     = 'MIT'
-  s.executables << 'migrate'
+  s.executables << 'gazebo'
 
-  s.add_development_dependency "bundler", "~> 1.13"
+  s.add_development_dependency "bundler", "~> 1.1"
   s.add_development_dependency "rake", "~> 10.0"
 
   s.add_dependency 'activesupport', '~> 5.0'
   s.add_dependency 'pg', '~> 0.20.0'
   s.add_dependency 'rack', '~> 2.0', '>= 2.0.1'
   s.add_dependency 'colorize', '~> 0.8.1'
+  s.add_dependency 'thor', '~> 0.19', '>= 0.19.1'
 end

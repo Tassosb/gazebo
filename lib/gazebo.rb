@@ -8,13 +8,14 @@ require_relative 'static_asset_server'
 require_relative 'show_exceptions'
 require_relative 'auto_loader'
 require_relative 'router'
+require_relative 'cli'
 
 module Gazebo
   Router = Router.new
   VERSION = "0.1.1"
 
   def self.app
-    fetch_routes!
+    fetch_routes
 
     app = Proc.new do |env|
       req = Rack::Request.new(env)
@@ -34,7 +35,7 @@ module Gazebo
     const_set("ROOT", root)
   end
 
-  def self.fetch_routes!
+  def self.fetch_routes
     file = File.join(ROOT, "config/routes.rb")
 
     File.open(file) do |f|
@@ -42,15 +43,11 @@ module Gazebo
     end
   end
 
-  def self.seed!
+  def self.seed
     file = File.join(ROOT, "db/seeds.rb")
 
     File.open(file) do |f|
       self.class_eval(f.read)
     end
-  end
-
-  def self.migrate
-    DBConnection.run_migrations
   end
 end

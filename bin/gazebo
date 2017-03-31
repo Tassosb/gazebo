@@ -1,0 +1,6 @@
+#!/usr/bin/env ruby -U
+
+require 'gazebo'
+
+Gazebo.root = File.expand_path(Dir.pwd)
+Gazebo::DatabaseTasks.start( ARGV )
