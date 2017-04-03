@@ -12,5 +12,4 @@ module Gazebo
       Gazebo.seed
     end
   end
-
 end

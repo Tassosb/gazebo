@@ -19,6 +19,7 @@ class StaticAssetServer
     res.finish
   end
 
+  private
   def servable?(path)
     path.match("#{root}")
   end
