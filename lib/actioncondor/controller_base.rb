@@ -6,7 +6,6 @@ class ControllerBase
     @@protect_from_forgery = true
   end
 
-  # Setup the controller
   def initialize(req, res, route_params = {})
     @req = req
     @res = res
@@ -18,12 +17,10 @@ class ControllerBase
     @flash ||= Flash.new(req)
   end
 
-  # Helper method to alias @already_built_response
   def already_built_response?
     @already_built_response || false
   end
 
-  # Set the response status code and header
   def redirect_to(url)
     check_for_repeat_action!
     res.status = 302
@@ -34,9 +31,6 @@ class ControllerBase
     @already_built_response = true
   end
 
-  # Populate the response with content.
-  # Set the response's content type to the given type.
-  # Raise an error if the developer tries to double render.
   def render_content(content, content_type)
     check_for_repeat_action!
     res['Content-Type'] = content_type
@@ -47,13 +41,11 @@ class ControllerBase
     @already_built_response = true
   end
 
-  #raise error if already_built_response
+  #change to custom doubleRender error
   def check_for_repeat_action!
     raise "Cannot call render/redirect twice in one action" if already_built_response?
   end
 
-  # use ERB and binding to evaluate templates
-  # pass the rendered html to render_content
   def render(template_name)
     controller_name = self.class.to_s.underscore[0..-("_controller".length + 1)]
     file_path = "app/views/#{controller_name}/#{template_name}.html.erb"
@@ -66,12 +58,10 @@ class ControllerBase
     render_content(content, 'text/html')
   end
 
-  # method exposing a `Session` object
   def session
     @session ||= Session.new(req)
   end
 
-  # use this with the router to call action_name (:index, :show, :create...)
   def invoke_action(name)
     if protect_from_forgery? && req.request_method != 'GET'
       check_authenticity_token
