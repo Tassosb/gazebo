@@ -19,8 +19,6 @@ class Flash
     @flash[key.to_s] = val
   end
 
-  # serialize the hash into json and save in a cookie
-  # add to the responses cookies
   def store_flash(res)
     res.set_cookie(
       '_gazebo_app_flash',
