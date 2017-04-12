@@ -52,7 +52,7 @@ class FileServer
   def requested_file_name(env)
     req = Rack::Request.new(env)
     path = req.path
-    dir = File.dirname(__FILE__)
-    File.join(dir, '..', path)
+    dir = Gazebo::ROOT
+    File.join(dir, path)
   end
 end
