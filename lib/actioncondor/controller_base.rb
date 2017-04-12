@@ -1,7 +1,6 @@
 class ControllerBase
   attr_reader :req, :res, :params, :token, :flash
 
-
   def self.protect_from_forgery
     @@protect_from_forgery = true
   end
@@ -34,6 +33,8 @@ class ControllerBase
   def render_content(content, content_type)
     check_for_repeat_action!
     res['Content-Type'] = content_type
+    content = content.to_json if content_type.match(/json/)
+
     res.write(content)
 
     session.store_session(res)
