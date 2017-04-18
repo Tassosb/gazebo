@@ -2,7 +2,7 @@
 
 A light-weight MVC framework inspired by Rails.
 Check out my beat-making app built to demonstrate using this gem.
-[Github](https://github.com/Tassosb/gazebo "Gazebo Github") |
+[Github](https://github.com/Tassosb/gazebo-demo "Gazebo Github") |
 [Live](http://gazebo-demo.herokuapp.com/ "Live Link")
 
 ## Installation
@@ -70,11 +70,9 @@ example: `has_many_through :cats, :humans, :cats`
 
 ### ActiveLeopard Query Methods
 
-The following query methods are available after inheriting from ActiveLeopard::Base. They return Relation objects and can be chained on to each other. The query that is built is only triggered when the actually query result is needed. Relation object have access to the Enumerables module.
+The following query methods are available after inheriting from ActiveLeopard::Base. They return Relation objects and can be chained on to each other. The query that is built is only triggered when the actually query result is needed. Relation objects have access to the Enumerables module.
 
 - `::all`
-- `::first`
-- `::last`
 
 - `::joins(association symbol or string)`
 - `::select(string)`
@@ -85,8 +83,10 @@ The following query methods are available after inheriting from ActiveLeopard::B
 - `::where(string or hash)`
 - `::distinct`
 
-Rather than returning a relation object, the following methods return an array of the found records as objects.
+Rather than returning a relation object, the following methods return the found records as object(s).
 
+- `::first`
+- `::last`
 - `::find(id)`
 - `::find_by(string or hash)`
 
@@ -150,4 +150,4 @@ Use `#flash` to expose a flash object. Anything set in the flash object using `[
 
 ## Serving Static Assets
 
-Place any static assets in `app/assets/`. Most MIME types are supported by the static asset server.
+Place any static assets in `app/assets/`. Most MIME types are supported by the static asset server. You will need to provide the path relative to the root of the project directory. (e.g. `app/assets/images/some_image.jpg`)
