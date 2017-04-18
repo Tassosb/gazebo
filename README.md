@@ -3,7 +3,7 @@
 A light-weight MVC framework inspired by Rails.
 Check out my beat-making app built to demonstrate using this gem.
 [Github](https://github.com/Tassosb/gazebo "Gazebo Github") |
-[Live](http://gazebo-demo.herokuapp.com/cats "Live Link")
+[Live](http://gazebo-demo.herokuapp.com/ "Live Link")
 
 ## Installation
 
