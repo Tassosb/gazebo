@@ -40,6 +40,22 @@ Files in `db/migrations/` will be read and executed as raw sql. Specify the orde
 
 `gazebo migrate` runs any new migrations. Migrations are deemed to be new based on the presence of the filename in a 'migrations' table. At the moment there is no command to rollback migrations. Simply add new ones to reverse the changes you made.
 
+```
+#lib/activeleopard/db_connection.rb
+
+def self.run_migration_file(file_name)
+  migration_name = file_name.match(/\w+/).to_s
+
+  next if migration_name.empty? || already_run?(migration_name)
+
+  file = File.join(Gazebo::ROOT, "db/migrations", file_name)
+  migration_sql = File.read(file)
+  execute(migration_sql)
+
+  record_migration!(migration_name)
+end
+```
+
 ## Models and ActiveLeopard
 
 Model files should be named the singular version of their associated table name. Add model files in `app/models/`. All model classes need to inherit from ActiveLeopard::Base. Additionally, users need to call `::finalize!` at the end of the model class definition.
@@ -81,7 +97,29 @@ The following query methods are available after inheriting from ActiveLeopard::B
 - `::from(string)`
 - `::order(string)`
 - `::where(string or hash)`
+
+```
+#lib/activeleopard/modules/searchable.rb
+
+def where(*params)
+  Relation.new(
+    {where: WhereClause.new(params)},
+    self
+    )
+end
+```
 - `::distinct`
+
+The Relation object holds onto the query parameters inside of the `query` instance variable. Before executing the query, or when requested by the user for debugging, the Relation object calls `#as_sql` on each of the clause objects inside of the query hash to construct the sql query.
+```
+#lib/activeleopard/relation.rb
+
+def as_sql
+  Relation.ordered_clauses.map do |clause|
+    query[clause].as_sql
+  end.join(" \n ")
+end
+```
 
 Rather than returning a relation object, the following methods return the found records as object(s).
 
