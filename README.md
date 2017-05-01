@@ -2,8 +2,8 @@
 
 A light-weight MVC framework inspired by Rails.
 Check out my beat-making app built to demonstrate using this gem.
-[Github](https://github.com/Tassosb/gazebo "Gazebo Github") |
-[Live](http://gazebo-demo.herokuapp.com/cats "Live Link")
+[Github](https://github.com/Tassosb/gazebo-demo "Gazebo Github") |
+[Live](http://gazebo-demo.herokuapp.com/ "Live Link")
 
 ## Installation
 
@@ -42,7 +42,7 @@ Files in `db/migrations/` will be read and executed as raw sql. Specify the orde
 
 ## Models and ActiveLeopard
 
-Model files should be named the singular version of their associated table name. Add model files in `app/models/`. All model classes need to inherit from ActiveLeopard::Base.
+Model files should be named the singular version of their associated table name. Add model files in `app/models/`. All model classes need to inherit from ActiveLeopard::Base. Additionally, users need to call `::finalize!` at the end of the model class definition.
 
 ### Validations
 
@@ -70,12 +70,84 @@ example: `has_many_through :cats, :humans, :cats`
 
 ### ActiveLeopard Query Methods
 
-The following query methods are available after inheriting from ActiveLeopard::Base. They return Relation objects and can be chained on to each other. The query that is built is only triggered when the actually query result is needed. Relation object have access to the Enumerables module.
+The following query methods are available after inheriting from ActiveLeopard::Base. They return Relation objects and can be chained on to each other. The query that is built is only triggered when the actually query result is needed. Relation objects have access to the Enumerables module.
 
 - `::all`
+
+- `::joins(association symbol or string)`
+- `::select(string)`
+- `::group(string)`
+- `::limit(number)`
+- `::from(string)`
+- `::order(string)`
+- `::where(string or hash)`
+- `::distinct`
+
+Rather than returning a relation object, the following methods return the found records as object(s).
+
 - `::first`
 - `::last`
-- `::joins(association)`
+- `::find(id)`
+- `::find_by(string or hash)`
 
-## ActionCondor
-A Controller Base Class that is combined with a custom router and asset server to handle requests and build responses.
+### CRUD Methods
+
+- `::new(params_hash)`
+- `save` ( returns true or false )
+- `#valid?`
+- `#destroy`
+- `::destroy_all`
+
+### Lifecycle Callback Methods
+
+- `::after_initialize(callback_method)` (callback method is invoked in last line of initialize)
+
+## Seeding
+
+Add a `seeds.rb` in /db. You will have access to all the model classes you've defined when you run `bundle exec rake db:seed`.
+
+## Routes
+
+Routes can be defined in `config/routes.rb`. You will need to make this file yourself. Define routes within a block passed to the `Gazebo::Router.draw` method. You need to write out the path as a regular expression, as the router will use regular expression to match wildcards in the path.
+
+Example:
+```
+Gazebo::Router.draw do
+  get Regexp.new("^/beats"), BeatsController, :index
+  delete Regexp.new("^/beats/(?<id>\\d+)$"), BeatsController, :destroy
+end
+```
+
+With the second route, any number after '/beats' will show up in params under a key of 'id'.
+
+## Controllers and ActionCondor
+
+Controller file names should be the constantized form of the folder names in '/views'. Otherwise, ActionCondor will not be able to guess which template to render by default.
+
+### Session
+
+`#session` exposes a Session object which provides an interface for setting keys in an application session cookie. This could be used to implement a basic auth pattern.
+
+### CSRF Protection
+
+When `::protect_from_forgery` is invoked inside of a controller class definition, any non-get requests will be denied unless they carry the correct authenticity_token. authenticity_token can be sent up in forms by including a hidden input with the value given by `#form_authenticity_token`.
+
+### Rendering and Redirecting
+
+The main purpose of the controller base is to build up a response. You can do this easily with the following methods.
+
+Note: a params hash will be populated from wildcards in the url, or data from request. Use `#params` to access this information.
+
+`render(template_name)` (only renders html views at this point)
+
+`redirect_to(url)` (paths relative to project root work fine)
+
+`render_content(content, content_type)` (with this you can render json or text/html)
+
+### Flash
+
+Use `#flash` to expose a flash object. Anything set in the flash object using `[]=` will be available for the current and next req/res cycle. Key value pairs set in `#flash.now` will only be available in the current cycle.
+
+## Serving Static Assets
+
+Place any static assets in `app/assets/`. Most MIME types are supported by the static asset server. You will need to provide the path relative to the root of the project directory. (e.g. `app/assets/images/some_image.jpg`)
