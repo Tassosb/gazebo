@@ -29,19 +29,24 @@ class DBConnection
     migrations.sort_by! { |fname| Integer(fname[0..1]) }
 
     migrations.each do |file_name|
-      migration_name = file_name.match(/\w+/).to_s
-
-      next if migration_name.empty? || already_run?(migration_name)
-
-      file = File.join(Gazebo::ROOT, "db/migrations", file_name)
-      migration_sql = File.read(file)
-      execute(migration_sql)
-
-      record_migration!(migration_name)
+      run_migration_file(file_name)
     end
   end
 
   private
+
+  def self.run_migration_file(file_name)
+    migration_name = file_name.match(/\w+/).to_s
+
+    next if migration_name.empty? || already_run?(migration_name)
+
+    file = File.join(Gazebo::ROOT, "db/migrations", file_name)
+    migration_sql = File.read(file)
+    execute(migration_sql)
+
+    record_migration!(migration_name)
+  end
+
   def self.database_name
     Gazebo::ROOT.split('/').last.gsub("-", "_") + '_development'
   end
