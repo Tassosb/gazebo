@@ -1,9 +1,9 @@
 # Gazebo
 
-A light-weight MVC framework inspired by Rails.
+A light-weight MVC framework inspired by Rails. 
 Check out my beat-making app built to demonstrate using this gem.
-[Github](https://github.com/Tassosb/gazebo-demo "Gazebo Github") |
-[Live](http://gazebo-demo.herokuapp.com/ "Live Link")
+[Github](https://github.com/Tassosb/beats-machine "Gazebo Github") |
+[Live](http://beats-machine.herokuapp.com/ "Live Demo")
 
 ## Installation
 
@@ -11,7 +11,7 @@ Check out my beat-making app built to demonstrate using this gem.
 
 ## Project Setup
 
-You will need to create a project directory with the following structure (need to add a `gazebo new` command):
+You will need to create a project directory with the following structure (No `gazebo new` command yet):
 
 - /app_name
   - /app
@@ -105,7 +105,7 @@ def where(*params)
   Relation.new(
     {where: WhereClause.new(params)},
     self
-    )
+  )
 end
 ```
 - `::distinct`
@@ -142,7 +142,7 @@ Rather than returning a relation object, the following methods return the found 
 
 ## Seeding
 
-Add a `seeds.rb` in /db. You will have access to all the model classes you've defined when you run `bundle exec rake db:seed`.
+Add `seeds.rb` in /db. You will have access to all the model classes you've defined when you run `bundle exec gazebo seed`.
 
 ## Routes
 
@@ -164,7 +164,7 @@ Controller file names should be the constantized form of the folder names in '/v
 
 ### Session
 
-`#session` exposes a Session object which provides an interface for setting keys in an application session cookie. This could be used to implement a basic auth pattern.
+`#session` exposes a Session object which provides an interface for setting keys in an application session cookie. This could be used to implement a basic auth pattern (see demo app for example of auth implementation).
 
 ### CSRF Protection
 
@@ -189,3 +189,10 @@ Use `#flash` to expose a flash object. Anything set in the flash object using `[
 ## Serving Static Assets
 
 Place any static assets in `app/assets/`. Most MIME types are supported by the static asset server. You will need to provide the path relative to the root of the project directory. (e.g. `app/assets/images/some_image.jpg`)
+
+## Next Steps
+- RSpec test suite
+- More commands, namely `gazebo new`
+- Method to eagerly load associated data (i.e. `#includes`)
+- Have association methods return Association Collection objects that can take query/CRUD methods
+
