@@ -1,4 +1,3 @@
-require 'byebug'
 require 'rack'
 require 'uri'
 
@@ -12,7 +11,7 @@ require_relative 'cli'
 
 module Gazebo
   Router = Router.new
-  VERSION = "0.1.4"
+  VERSION = "0.1.5"
 
   def self.app
     fetch_routes

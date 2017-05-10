@@ -46,7 +46,7 @@ Files in `db/migrations/` will be read and executed as raw sql. Specify the orde
 def self.run_migration_file(file_name)
   migration_name = file_name.match(/\w+/).to_s
 
-  next if migration_name.empty? || already_run?(migration_name)
+  return if migration_name.empty? || already_run?(migration_name)
 
   file = File.join(Gazebo::ROOT, "db/migrations", file_name)
   migration_sql = File.read(file)
