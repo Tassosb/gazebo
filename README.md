@@ -22,7 +22,7 @@ You will need to create a project directory with the following structure (No `ga
   - /db
     - /migrations
 
-Add `gazebo ~> '^0.1.4'` to your Gemfile.
+Add `gem gazebo` to your Gemfile.
 
 Additionally, at the root of the project you will need a file named `config.ru` with the following code:
 
