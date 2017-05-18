@@ -121,7 +121,7 @@ def as_sql
 end
 ```
 
-Rather than returning a relation object, the following methods return the found records as object(s).
+Rather than returning a relation object, the following methods return the found records as model instance(s).
 
 - `::first`
 - `::last`
